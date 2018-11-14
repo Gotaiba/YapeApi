@@ -14,5 +14,6 @@ namespace YapiApi.Controllers
 
             return View();
         }
+
     }
 }

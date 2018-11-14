@@ -13,9 +13,15 @@ using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;
 using Microsoft.Owin.Security.Cookies;
 using Microsoft.Owin.Security.OAuth;
+using YapiApi.Manager.API;
+using YapiApi.Manager.Managers;
+using YapiApi.Manager.Common;
 using YapiApi.Models;
 using YapiApi.Providers;
 using YapiApi.Results;
+using YapiApi.Data;
+using System.Net.Mail;
+using System.Linq;
 
 namespace YapiApi.Controllers
 {
@@ -25,6 +31,8 @@ namespace YapiApi.Controllers
     {
         private const string LocalLoginProvider = "Local";
         private ApplicationUserManager _userManager;
+        MngrAccount mngrAccount = new MngrAccount();
+        MngrAPI mngrAPI = new MngrAPI();
 
         public AccountController()
         {
@@ -337,8 +345,31 @@ namespace YapiApi.Controllers
                 Email = model.Email,
                 CreateDate = DateTime.Now
             };
-
-            IdentityResult result = await UserManager.CreateAsync(user, model.Password);
+            if(mngrAccount.IsPhoneNumberTaken(model.PhoneNumber))
+            {
+                return BadRequest("Phone number is taken");
+            }
+            if(model.Email!=null)
+            {
+                if (mngrAccount.IsEmailTaken(model.Email))
+                    return BadRequest("Email is taken");
+            }
+            IdentityResult result = await UserManager.CreateAsync(user, model.Password);           
+            Random rnd = new Random();
+            int shortcode = rnd.Next(1000, 9999);
+            string ClearPhoneNumber = model.PhoneNumber;
+            if(ClearPhoneNumber[0]=='0')
+            {
+                ClearPhoneNumber = ClearPhoneNumber.Substring(0);
+            }
+            if (mngrAPI.SendSMSCode(Enums.CountryCode.SudanCode.ToString()+ClearPhoneNumber,shortcode.ToString())==Feedback.SMSFaild)
+            {
+                return BadRequest("No SMS was sent");
+            }
+            if(model.Email!=null)
+            {
+                SendEmail(model.Email);
+            }
 
             if (!result.Succeeded)
             {
@@ -346,6 +377,104 @@ namespace YapiApi.Controllers
             }
 
             return Ok();
+        }
+
+        [AllowAnonymous]
+        [HttpPost]
+        [Route("ResendSMS")]
+        public IHttpActionResult ResendSms(string phone,string UserId)        
+        {
+            if (phone == null || UserId == null)
+            {
+                return BadRequest("No Parameters");
+            }
+            try
+            {
+                Random rnd = new Random();
+                int shortcode = rnd.Next(1000, 9999);
+                string ClearPhoneNumber = phone;
+                if (ClearPhoneNumber[0] == '0')
+                {
+                    ClearPhoneNumber = ClearPhoneNumber.Substring(0);
+                }
+                using (YapiEntities db = new YapiEntities())
+                {
+                    UserTempCode tempCode = new UserTempCode()
+                    {
+                        UserId = UserId,
+                        ShortCode = shortcode,
+                        Generated = DateTime.Now,
+                        Expires = DateTime.Now.AddDays(1)
+                    };
+                    db.UserTempCodes.Add(tempCode);
+                    db.SaveChanges();
+                }
+                if (mngrAPI.SendSMSCode(Enums.CountryCode.SudanCode.ToString() + ClearPhoneNumber, shortcode.ToString()) == Feedback.SMSFaild)
+                {
+                    return BadRequest("No SMS was sent");
+                }
+                return Ok();
+            }
+            catch(Exception ex)
+            {
+                return BadRequest(ex.Message.ToString());
+            }
+        }
+        [HttpPost]
+        [Route("Submitcode")]
+        public async Task<IHttpActionResult> SubmitCode(int? code,string UserId)
+        {
+            if(code==null || UserId==null)
+            {
+                return BadRequest("No Parameters");
+            }
+            try
+            {
+                using (YapiEntities db = new YapiEntities())
+                {
+                    var TempCode = db.UserTempCodes.Where(t => t.UserId == UserId && t.ShortCode==code && t.IsUsed==null).OrderByDescending(d => d.Generated).FirstOrDefault();
+                    if(TempCode==null)
+                    {
+                        return BadRequest("Code Is Used");
+                    }
+                    TempCode.IsUsed = true;
+                    db.Entry(TempCode).State = System.Data.Entity.EntityState.Modified;
+                    await db.SaveChangesAsync();
+                    var user = UserManager.FindById(UserId);
+                    user.PhoneNumberConfirmed = true;
+                    IdentityResult result = await UserManager.UpdateAsync(user);
+                    if (!result.Succeeded)
+                    {
+                        return GetErrorResult(result);
+                    }
+                    return Ok();
+                }
+            }
+            catch(Exception ex)
+            {
+                return BadRequest(ex.Message.ToString());
+            }
+        }
+        private string GetValueConfig(string key)
+        {
+            return System.Configuration.ConfigurationManager.AppSettings[key];
+        }
+        private void SendEmail(string Destination)
+        {
+            MailMessage mail = new MailMessage();
+            mail.To.Add(Destination);
+            mail.From = new MailAddress(GetValueConfig( Enums.AppConfig.RegisterEmail.ToString()));
+            mail.Subject = "Welcome to Yapi";
+            string Body = "<h3 align='center'>Welcome to Yapi</h3><br/><h3 align='center'> Thank you for registring with us and be part of our family :) <br/> </h3> <br/> <h2 align='center'>";
+            mail.Body = Body;
+            mail.IsBodyHtml = true;
+            SmtpClient smtp = new SmtpClient();
+            smtp.Host = GetValueConfig(Enums.AppConfig.RegisterEmailHost.ToString());
+            smtp.Port = int.Parse(GetValueConfig(Enums.AppConfig.RegisterEmailPort.ToString()));
+            smtp.UseDefaultCredentials = false;
+            smtp.Credentials = new System.Net.NetworkCredential(GetValueConfig(Enums.AppConfig.RegisterEmail.ToString()), GetValueConfig(Enums.AppConfig.RegisterEmailPassword.ToString())); // Enter seders User name and password  
+            smtp.EnableSsl = false;
+            smtp.Send(mail);
         }
 
         // POST api/Account/RegisterExternal

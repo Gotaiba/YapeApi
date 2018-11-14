@@ -5,6 +5,10 @@ VisualStudioVersion = 15.0.28010.2041
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YapiApi", "YapiApi\YapiApi.csproj", "{A73E4826-CD6E-453B-9159-FB7BB33FE8D6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YapiApi.Manager", "YapiApi.Manager\YapiApi.Manager.csproj", "{08B071CE-C282-428A-B12B-5092AB6C530F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YapiApi.Data", "YapiApi.Data\YapiApi.Data.csproj", "{C2636DFF-D14E-466A-A515-2AD330406BAA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +19,14 @@ Global
 		{A73E4826-CD6E-453B-9159-FB7BB33FE8D6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A73E4826-CD6E-453B-9159-FB7BB33FE8D6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A73E4826-CD6E-453B-9159-FB7BB33FE8D6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{08B071CE-C282-428A-B12B-5092AB6C530F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{08B071CE-C282-428A-B12B-5092AB6C530F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{08B071CE-C282-428A-B12B-5092AB6C530F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{08B071CE-C282-428A-B12B-5092AB6C530F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C2636DFF-D14E-466A-A515-2AD330406BAA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C2636DFF-D14E-466A-A515-2AD330406BAA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C2636DFF-D14E-466A-A515-2AD330406BAA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C2636DFF-D14E-466A-A515-2AD330406BAA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

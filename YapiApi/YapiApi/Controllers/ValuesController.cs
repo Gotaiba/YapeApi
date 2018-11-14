@@ -7,7 +7,7 @@ using System.Web.Http;
 
 namespace YapiApi.Controllers
 {
-    [Authorize]
+    //[Authorize]
     public class ValuesController : ApiController
     {
         // GET api/values
@@ -17,9 +17,9 @@ namespace YapiApi.Controllers
         }
 
         // GET api/values/5
-        public string Get(int id)
+        public IHttpActionResult Get(int id)
         {
-            return "value";
+            return Ok("value");
         }
 
         // POST api/values
