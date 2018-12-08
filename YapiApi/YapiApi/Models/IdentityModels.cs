@@ -10,12 +10,21 @@ namespace YapiApi.Models
     // You can add profile data for the user by adding more properties to your ApplicationUser class, please visit https://go.microsoft.com/fwlink/?LinkID=317594 to learn more.  
     public class ApplicationUser : IdentityUser
     {
+        public int? EntityGroup { get; set; }
+        public int? RegistrationType { get; set; }
+        public string PAN { get; set; }
+        public string iPIN { get; set; }
+        public string expDate { get; set; }
+        public string mbr { get; set; }
+        public string EntityType { get; set; }
+        public string EntityId { get; set; }      
         public string FirstName { get; set; }
         public string LastName { get; set; }
 
         public bool Suspended { get; set; }
 
         public string ImagePath { get; set; }
+       
 
         public DateTime CreateDate { get; set; }
 

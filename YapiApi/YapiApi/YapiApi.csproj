@@ -247,6 +247,14 @@
     <Compile Include="Migrations\201810121749285_AddedAnotherPropertyToFoo.Designer.cs">
       <DependentUpon>201810121749285_AddedAnotherPropertyToFoo.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201811171116439_EBSFileds.cs" />
+    <Compile Include="Migrations\201811171116439_EBSFileds.Designer.cs">
+      <DependentUpon>201811171116439_EBSFileds.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201811171208247_EBSFiledsUpdatedv2.cs" />
+    <Compile Include="Migrations\201811171208247_EBSFiledsUpdatedv2.Designer.cs">
+      <DependentUpon>201811171208247_EBSFiledsUpdatedv2.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountBindingModels.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
@@ -357,6 +365,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201810121749285_AddedAnotherPropertyToFoo.resx">
       <DependentUpon>201810121749285_AddedAnotherPropertyToFoo.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201811171116439_EBSFileds.resx">
+      <DependentUpon>201811171116439_EBSFileds.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201811171208247_EBSFiledsUpdatedv2.resx">
+      <DependentUpon>201811171208247_EBSFiledsUpdatedv2.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

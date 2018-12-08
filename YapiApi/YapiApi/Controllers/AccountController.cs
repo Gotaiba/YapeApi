@@ -362,6 +362,18 @@ namespace YapiApi.Controllers
             {
                 ClearPhoneNumber = ClearPhoneNumber.Substring(0);
             }
+            using (YapiEntities db = new YapiEntities())
+            {
+                UserTempCode tempCode = new UserTempCode()
+                {
+                    UserId = user.Id,
+                    ShortCode = shortcode,
+                    Generated = DateTime.Now,
+                    Expires = DateTime.Now.AddDays(1)
+                };
+                db.UserTempCodes.Add(tempCode);
+                await db.SaveChangesAsync();
+            }
             if (mngrAPI.SendSMSCode(Enums.CountryCode.SudanCode.ToString()+ClearPhoneNumber,shortcode.ToString())==Feedback.SMSFaild)
             {
                 return BadRequest("No SMS was sent");
@@ -376,7 +388,7 @@ namespace YapiApi.Controllers
                 return GetErrorResult(result);
             }
 
-            return Ok();
+            return Ok(user.Id);
         }
 
         [AllowAnonymous]
@@ -432,7 +444,7 @@ namespace YapiApi.Controllers
             {
                 using (YapiEntities db = new YapiEntities())
                 {
-                    var TempCode = db.UserTempCodes.Where(t => t.UserId == UserId && t.ShortCode==code && t.IsUsed==null).OrderByDescending(d => d.Generated).FirstOrDefault();
+                    var TempCode = db.UserTempCodes.Where(t => t.UserId == UserId && t.ShortCode==code && t.IsUsed==null && t.Expires>DateTime.Now).OrderByDescending(d => d.Generated).FirstOrDefault();
                     if(TempCode==null)
                     {
                         return BadRequest("Code Is Used");
